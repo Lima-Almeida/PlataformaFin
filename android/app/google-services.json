@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "598610989523",
+    "project_id": "plataformafin-d7def",
+    "storage_bucket": "plataformafin-d7def.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:598610989523:android:2f25ee23fb587e75b81f26",
+        "android_client_info": {
+          "package_name": "com.example.my_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDU_RUIXJJrmP1tX1YnpmgGgQQ4Gh6ATGk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
