@@ -1,3 +1,9 @@
+# Atividade 3: Elicitação de Requisitos
+
+Nesse documento, iremos apresentar a especificação de requisitos gerais obtidos por dois processos de elicitação de requisitos com base na temática geral da aplicação feita pelo nosso
+grupo. Vale, então, lembrar a ideia geral da aplicação: uma plataforma de controle financeiro, que irá ajudar o usuário a fazer escolhas melhores referentes às suas finanças. Para obtermos
+os requisitos, foram utilizadas as técnicas do benchmark e das entrevistas.
+
 ## Primeira atividade de elicitação de requisitos: Benchmark
 A primeira atividade realizada pelo grupo para elicitar os requisitos do nosso projeto foi o benchmarking. Para fazer isso, escolhemos estudar as features de dois aplicativos pertinentes para a nossa aplicação: o Mobills e o Organizze.
 
