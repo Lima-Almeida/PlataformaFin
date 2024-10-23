@@ -139,5 +139,6 @@ Com base nas duas aplicações estudadas, podemos expor alguns requisitos obtido
 - O sistema deve apresentar gráficos visuais, como o gráfico de pizza e gráficos de barras, a fim de oferecer uma visualização de transações financeiras de forma intuitiva.
 - O sistema deve apresentar a opção do usuário integrar suas contas bancárias para automatizar a entrada de dados financeiros.
 - O sistema deve oferecer a possibilidade de estipular limites de gastos por categorias e alertar quando esse limite estiver próximo de ser atingido.
+- O sistema deve permitir que o usuário modifique as informações que são exibidas na página inicial.
 
 ## Segunda atividade de elicitação de requisitos: Entrevista
