@@ -77,6 +77,7 @@ Nas imagens abaixo, é possível conferir as informações padrão dessa página
 *Funcionalidades de destaque presentes na página inicial.*
 
 - **Fluxo de caixa**
+
 Nessa página, é possível visualizar o histórico de caixa em cada mês, além do total de entradas, o total de saídas e o saldo total do usuário. Os gastos podem ser encaixados em categorias,
 sendo que cada categoria possui um ícone distinto para representá-la.
 
@@ -85,6 +86,7 @@ sendo que cada categoria possui um ícone distinto para representá-la.
 *Fluxo de caixa.*
 
 - **Relatórios**
+  
 Essa página contém alguns gráficos para que o usuário possa visualizar melhor os seus gastos. Assim como no aplicativo Mobills, existem dois tipos de gráfico: um circular que detalha a divisão
 de despesas por categorias, bem como um em barras para exibir o total de entradas e o total de saídas.
 
@@ -93,6 +95,7 @@ de despesas por categorias, bem como um em barras para exibir o total de entrada
 *Relatórios financeiros em formato de gráficos.*
 
 - **Lançamento financeiro**
+
 Essa funcionalidade permite adicionar alguma movimentação financeira, que é dividida em despesas, tranferências e receitas. É possível detalhar um pouco melhor cada movimentação, com informações como:
   - De qual banco, carteira ou cofrinho ela veio.
   - Quando ela ocorreu.
@@ -104,6 +107,7 @@ Essa funcionalidade permite adicionar alguma movimentação financeira, que é d
 *Cadastro de lançamentos financeiros.*
 
 - **Limite de gastos**
+
 Uma funcionalidade muito interessante do Organizze é a definição de um limite de gastos, podendo ser geral ou por categorias específicas. Com a definição desses limites, o aplicativo consegue
 dar insights pro usuário referentes à sua saúde financeira (funcionalidade que já foi abordada anteriormente). O limite de gastos pode ser personalizado: por exemplo, ele pode ser um limite
 recorrente (ou seja, todo mês esse limite será o mesmo) ou único em um mês. 
