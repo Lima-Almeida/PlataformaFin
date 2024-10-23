@@ -1,7 +1,9 @@
 # Atividade 3: Elicitação de Requisitos
 
 Nesse documento, iremos apresentar a especificação de requisitos gerais obtidos por dois processos de elicitação de requisitos com base na temática geral da aplicação feita pelo nosso
-grupo. Vale, então, lembrar a ideia geral da aplicação: uma plataforma de controle financeiro, que irá ajudar o usuário a fazer escolhas melhores referentes às suas finanças. Para obtermos
+grupo. Vale, então, lembrar a ideia geral da aplicação: uma plataforma de controle financeiro, que irá ajudar o usuário a fazer escolhas melhores referentes às suas finanças. 
+
+Para obtermos
 os requisitos, foram utilizadas as técnicas do benchmark e das entrevistas.
 
 ## Primeira atividade de elicitação de requisitos: Benchmark
@@ -118,7 +120,7 @@ recorrente (ou seja, todo mês esse limite será o mesmo) ou único em um mês.
     deixa a plataforma bem mais limpa e agradável.
     - App intuitivo e de fácil manuseio.
     - Divide os lançamentos em apenas três categorias, ao contrário do Mobills, o que pode facilitar o cadastro de lançamentos.
-    - 
+    
 - **Negativos**
     - Assim como o Mobills, o usuário deve pagar para conseguir usurfruir de todas as funcionalidades.
     - Não oferece a possibilidade de integração com contas bancárias, o que torna a experiência do usuário um pouco menos prática.
