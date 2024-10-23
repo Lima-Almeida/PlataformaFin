@@ -26,7 +26,7 @@ Aqui, são exibidas algumas informações importantes para o usuário, como seu 
 
 - **Transações**
 
-Nesta página, conseguimos visualizar todas as movimentações financeiras que o aplicativo possui acesso, sejam elas manuais (ou seja, colocadas manualmente pelo próprio usuário) ou automáticas (obtidas automaticamente pelo aplicativo pela integração com contas bancárias). As entradas e saídas são diferenciadas por cores (verde para as primeiras, vermelho para as segundas). É possível ver também o saldo atual do usuário, bem como um balanço mensal atrelado a cartões de crédito. Algumas funcionalidades interessantes dessa pág
+Nesta página, conseguimos visualizar todas as movimentações financeiras que o aplicativo possui acesso, sejam elas manuais (ou seja, colocadas manualmente pelo próprio usuário) ou automáticas (obtidas automaticamente pelo aplicativo pela integração com contas bancárias). As entradas e saídas são diferenciadas por cores (verde para as primeiras, vermelho para as segundas). É possível ver também o saldo atual do usuário, bem como um balanço mensal atrelado a cartões de crédito.
 
 ![Transações financeiras - Mobills](https://github.com/user-attachments/assets/2d15df46-cdcf-4aa2-9706-856cfb77f94e)
 
