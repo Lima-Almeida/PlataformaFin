@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/progress_bar/gf_progress_bar.dart';
 
@@ -9,42 +12,45 @@ class Metas extends StatefulWidget {
 }
 
 class _MetasState extends State<Metas> {
-  double budget = 0.0;
-  double spending = 0.0;
-  final Color green = Colors.greenAccent;
-  final Color yellow = Colors.yellowAccent;
-  final Color red = Colors.redAccent;
-  Color currentColor = Colors.grey;
+  double budget = 100.0;
+  double spending = 60.0;
+  final TextEditingController dinheiroController = TextEditingController();
 
+  Color getProgressColor(double ratio) {
+    if (ratio <= 0.3) return Colors.greenAccent;
+    if (ratio <= 0.7) return Colors.yellowAccent;
+    return Colors.redAccent;
+  }
+
+  void updateBudget(String value) {
+    try {
+      final newBudget = double.parse(value);
+      if (newBudget < 0) throw const SignalException("Budget menor que zero");
+
+      setState(() {
+        budget = newBudget;
+      });
+    } on SignalException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Por favor, digite um número positivo")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Por favor, digite um número válido")),
+      );
+    }
+  }
+
+  // Code smells de vazamento de memória
   @override
-  void initState() {
-    super.initState();
-    getBudgetAndSpendings();
-    setCurrentColor();
-  }
-
-  void setCurrentColor() {
-    double ratio = spending / budget;
-    setState(() {
-      if (ratio <= 0.3) {
-        currentColor = green;
-      } else if (ratio <= 0.7) {
-        currentColor = yellow;
-      } else {
-        currentColor = red;
-      }
-    });
-  }
-
-  Future<void> getBudgetAndSpendings() async {
-    setState(() {
-      budget = 100.0;
-      spending = 60.0;
-    });
+  void dispose() {
+    dinheiroController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final currentColor = getProgressColor(spending / budget);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Metas e Orçamento'),
@@ -85,8 +91,7 @@ class _MetasState extends State<Metas> {
                               backgroundColor: const Color.fromARGB(255, 0, 161, 22),
                             ),
                             onPressed: () {
-                              final dinheiroController = TextEditingController(text: budget.toStringAsFixed(2));
-
+                              dinheiroController.text = budget.toStringAsFixed(2);
                               showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
@@ -98,28 +103,13 @@ class _MetasState extends State<Metas> {
                                       ),
                                       actions: [
                                         TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
+                                          onPressed: () => Navigator.pop(context),
                                           child: const Text('Cancelar'),
                                         ),
                                         FilledButton(
                                           onPressed: () {
-                                            if (dinheiroController.text.isNotEmpty) {
-                                              try {
-                                                double newBudget = double.parse(dinheiroController.text);
-                                                setState(() {
-                                                  budget = newBudget;
-                                                });
-                                                setCurrentColor();
-                                                Navigator.pop(context);
-                                              } catch (parseError) {
-                                                final scaffold = ScaffoldMessenger.of(context);
-                                                scaffold.showSnackBar(
-                                                  const SnackBar(content: Text("Por favor, digite um número")),
-                                                );
-                                              }
-                                            }
+                                            updateBudget(dinheiroController.text);
+                                            Navigator.pop(context);
                                           },
                                           child: const Text("Confirmar"),
                                         ),
@@ -138,7 +128,7 @@ class _MetasState extends State<Metas> {
                     ),
                     GFProgressBar(
                       margin: const EdgeInsets.only(bottom: 5.0, left: 30.0, right: 30.0),
-                      percentage: spending / budget,
+                      percentage: min(spending / budget, 1),
                       animation: true,
                       animateFromLastPercentage: true,
                       animationDuration: 400,
@@ -157,7 +147,7 @@ class _MetasState extends State<Metas> {
                         ],
                       ),
                     ),
-                    Text("R\$${spending.toStringAsFixed(2)} out of R\$${budget.toStringAsFixed((2))}"),
+                    Text("R\$${spending.toStringAsFixed(2)} out of R\$${budget.toStringAsFixed(2)}"),
                   ],
                 ),
               ),
