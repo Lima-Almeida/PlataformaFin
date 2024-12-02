@@ -1,7 +1,7 @@
 class MonthlyLimit {
   final int month; // Mês (1 a 12)
   final int year;  // Ano
-  final double limit;
+  double limit;
   double spent;
 
   MonthlyLimit({
@@ -10,7 +10,14 @@ class MonthlyLimit {
     required this.limit,
     this.spent = 0.0,
   });
+
+  set setLimit(double value) {
+    limit = value;
+  }
 }
+
+// nome
+// data - limite, data - limite
 
 class Category {
   final String name;
