@@ -84,6 +84,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
     if (value.length < 6) {
       return 'A senha deve ter pelo menos 6 caracteres';
     }
+    if (value.length > 128) {
+      return 'A senha deve ter no máximo 128 caracteres';
+    }
     return null;
   }
 
@@ -94,12 +97,12 @@ class _CadastroScreenState extends State<CadastroScreen> {
         title: const Text(
           'Cadastro de Usuário',
           style: TextStyle(
-            color: AppColors.textSecondaryColor, // Cor branca para o título
-            fontWeight: FontWeight.bold,  // Fonte em negrito
+            color: AppColors.textSecondaryColor,
+            fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: AppColors.primaryColor,
-        centerTitle: true,  // Centralizando o título
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -120,6 +123,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
               child: Column(
                 children: [
                   TextFormField(
+                    key: const Key('nomeField'),
                     controller: _nomeController,
                     decoration: const InputDecoration(
                       labelText: 'Nome',
@@ -138,6 +142,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    key: const Key('emailField'),
                     controller: _emailController,
                     decoration: const InputDecoration(
                       labelText: 'Email',
@@ -151,6 +156,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    key: const Key('senhaField'),
                     controller: _senhaController,
                     decoration: const InputDecoration(
                       labelText: 'Senha',
