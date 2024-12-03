@@ -38,6 +38,101 @@ void main() {
       passwordController.dispose();
     });
 
+    test('Login falha com email vazio (Analise de Valor Limite)', () async {
+      emailController.text = '';
+      passwordController.text = 'senha123';
+
+      expect(
+        () async => await mockAuth.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid email address.'),
+          ),
+        ),
+      );
+    });
+
+    test('Login falha com email muito longo (Analise de Valor Limite)', () async {
+      emailController.text = '${'a' * 255}@test.com';
+      passwordController.text = 'password123';
+
+      expect(
+        () async => await mockAuth.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid email address.'),
+          ),
+        ),
+      );
+    });
+
+    test('Login falha com senha vazia (Analise de Valor Limite)', () async {
+      emailController.text = 'test@test.com';
+      passwordController.text = '';
+
+      expect(
+        () async => await mockAuth.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid password.'),
+          ),
+        ),
+      );
+    });
+
+    test('Login falha com senha com menos de 6 caracteres (Analise de Valor Limite)', () async {
+      emailController.text = 'test@test.com';
+      passwordController.text = '12345';
+
+      expect(
+        () async => await mockAuth.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid password.'),
+          ),
+        ),
+      );
+    });
+
+    test('Login falha com senha com mais de 128 caracteres (Analise de Valor Limite)', () async {
+      emailController.text = 'test@test.com';
+      passwordController.text = 'a' * 129;
+
+      expect(
+        () async => await mockAuth.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid password.'),
+          ),
+        ),
+      );
+    });
+
     test('Sucesso no login com email e senhas validos', () async {
       emailController.text = 'test@test.com';
       passwordController.text = 'senha123';
