@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/views/pages/metas.dart';
 import 'package:my_app/views/pages/cadastroReceitas.dart';
-import 'package:my_app/views/pages/cadastroCategoria.dart'; // Importando a tela de adicionar categoria
 import 'package:my_app/models/services/logout.dart'; // Para chamar o logout
 import 'package:my_app/views/pages/listaCategorias.dart';
 
@@ -41,15 +40,6 @@ class DrawerMenu extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => Metas()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Cadastro de Categorias'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => AddCategoryScreen()),
               );
             },
           ),
