@@ -11,7 +11,16 @@ class MockFirebaseAuthWithCustomErrors extends MockFirebaseAuth {
     required String email,
     required String password,
   }) async {
-    if (email.isEmpty || !email.contains('@') || email.length > 254) {
+    if (email.isEmpty || !email.contains('@') || email.length > 254 || email.contains('!')
+        || email.contains('#') || email.contains('%') || email.contains('&') || email.contains('*')
+        || email.contains('(') || email.contains(')') || email.contains('-') || email.contains('+')
+        || email.contains('=') || email.contains('[') || email.contains(']') || email.contains('{')
+        || email.contains('}') || email.contains('/') || email.contains('\\') || email.contains('|')
+        || email.contains(';') || email.contains(':') || email.contains(',') || email.contains('<')
+        || email.contains('>') || email.contains('?') || email.contains('`') || email.contains('~')
+        || email.contains(' ') || email.contains('\'') || email.contains('"') || email.contains('´')
+        || email.contains('^') || email.contains('¨') || email.contains('§') || email.contains('ª')
+        || email.contains('º') || email.contains('°')) {
       throw Exception('Invalid email address.');
     }
     if (password.isEmpty || password.length < 6 || password.length > 128) {
@@ -97,7 +106,9 @@ void main() {
     // [0-6] -> Inválido
     // [6-128] -> Válido
     // [128-∞] -> Inválido
-    test('Cadastro falha com senha menor que 6 caracteres (Classes de Equivalência)', () async {
+    test(
+        'Cadastro falha com senha menor que 6 caracteres (Classes de Equivalência)',
+        () async {
       nomeController.text = 'Test User';
       emailController.text = 'test@test.com';
       senhaController.text = '123';
@@ -117,7 +128,9 @@ void main() {
       );
     });
 
-    test('Cadastro falha com senha maior que 128 caracteres (Classes de Equivalência)', () async {
+    test(
+        'Cadastro falha com senha maior que 128 caracteres (Classes de Equivalência)',
+        () async {
       nomeController.text = 'Test User';
       emailController.text = 'test@test.com';
       senhaController.text = 'a' * 200;
@@ -137,9 +150,101 @@ void main() {
       );
     });
 
-    test('Cadastro com sucesso com dados válidos', () async {
+//Classes de Equivalência: 
+//[0-254] -> Válido
+//[254-∞] -> Inválido
+//com @ -> Válido
+//sem @ -> Inválido
+//com caracteres inválidos -> Inválido
+    test('Cadastro falha com email sem o caractere @ (Classes de Equivalência)',
+        () async {
       nomeController.text = 'Test User';
-      emailController.text = 'test@test.com';
+      emailController.text = 'usuarioemail.com';
+      senhaController.text = 'senha123';
+
+      expect(
+        () async => await mockAuth.createUserWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: senhaController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid email address.'),
+          ),
+        ),
+      );
+    });
+
+    test(
+        'Cadastro falha com email contendo caracteres inválidos (Classes de Equivalência)',
+        () async {
+      nomeController.text = 'Test User';
+      emailController.text = 'usuario@domínio!.com';
+      senhaController.text = 'senha123';
+
+      expect(
+        () async => await mockAuth.createUserWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: senhaController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid email address.'),
+          ),
+        ),
+      );
+    });
+
+    test('Cadastro falha com email vazio (Classes de Equivalência)', () async {
+      nomeController.text = 'Test User';
+      emailController.text = '';
+      senhaController.text = 'senha123';
+
+      expect(
+        () async => await mockAuth.createUserWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: senhaController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid email address.'),
+          ),
+        ),
+      );
+    });
+
+    test(
+        'Cadastro falha com email maior que 254 caracteres (Classes de Equivalência)',
+        () async {
+      nomeController.text = 'Test User';
+      emailController.text = '${'a' * 245}@example.com';
+      senhaController.text = 'senha123';
+
+      expect(
+        () async => await mockAuth.createUserWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: senhaController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid email address.'),
+          ),
+        ),
+      );
+    });
+
+    test('Cadastro com sucesso com email válido (Classes de Equivalência)',
+        () async {
+      nomeController.text = 'Test User';
+      emailController.text = 'usuario@dominio.com';
       senhaController.text = 'senha123';
 
       final userCredential = await mockAuth.createUserWithEmailAndPassword(
@@ -148,7 +253,7 @@ void main() {
       );
 
       expect(userCredential.user, isNotNull);
-      expect(userCredential.user?.email, equals('test@test.com'));
+      expect(userCredential.user?.email, equals('usuario@dominio.com'));
     });
   });
 }

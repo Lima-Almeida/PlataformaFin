@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../components/constants.dart';  // Importando o arquivo de constantes para cores
+import '../components/constants.dart';
 
 class CadastroScreen extends StatefulWidget {
   final VoidCallback showLoginPage;
@@ -30,18 +30,15 @@ class _CadastroScreenState extends State<CadastroScreen> {
         // Adicionar o nome do usuário ao Firestore
         await _salvarUsuarioFirestore(userCredential.user!.uid);
 
-        // Mostrar mensagem de sucesso
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Usuário registrado com sucesso!')),
         );
 
-        // Limpar os campos após o registro
         _formKey.currentState!.reset();
         _nomeController.clear();
         _emailController.clear();
         _senhaController.clear();
       } catch (e) {
-        // Tratar erros de registro
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro: ${e.toString()}')),
         );
@@ -71,7 +68,16 @@ class _CadastroScreenState extends State<CadastroScreen> {
     if (value == null || value.isEmpty) {
       return 'Por favor, insira seu email';
     }
-    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+    if (value.isEmpty || !value.contains('@') || value.length > 254 || value.contains('!')
+        || value.contains('#') || value.contains('%') || value.contains('&') || value.contains('*')
+        || value.contains('(') || value.contains(')') || value.contains('-') || value.contains('+')
+        || value.contains('=') || value.contains('[') || value.contains(']') || value.contains('{')
+        || value.contains('}') || value.contains('/') || value.contains('\\') || value.contains('|')
+        || value.contains(';') || value.contains(':') || value.contains(',') || value.contains('<')
+        || value.contains('>') || value.contains('?') || value.contains('`') || value.contains('~')
+        || value.contains(' ') || value.contains('\'') || value.contains('"') || value.contains('´')
+        || value.contains('^') || value.contains('¨') || value.contains('§') || value.contains('ª')
+        || value.contains('º') || value.contains('°')) {
       return 'Insira um email válido';
     }
     return null;
