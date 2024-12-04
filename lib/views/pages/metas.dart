@@ -10,7 +10,7 @@ import 'package:my_app/widgets/drawer_menu.dart'; // Importando o DrawerMenu
 
 class Metas extends StatefulWidget {
   const Metas({super.key});
-
+  
   @override
   State<Metas> createState() => _MetasState();
 }

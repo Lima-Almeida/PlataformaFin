@@ -3,6 +3,7 @@ import 'package:my_app/views/pages/metas.dart';
 import 'package:my_app/views/pages/cadastroReceitas.dart';
 import 'package:my_app/models/services/logout.dart'; // Para chamar o logout
 import 'package:my_app/views/pages/listaCategorias.dart';
+import 'package:my_app/views/pages/relatorios.dart'; // Import da página de Relatórios
 
 class DrawerMenu extends StatelessWidget {
   @override
@@ -23,14 +24,12 @@ class DrawerMenu extends StatelessWidget {
               ),
             ),
           ),
-          // Adicionando o botão "Home" com a mesma funcionalidade que "Metas"
           ListTile(
             title: const Text('Home'),
             onTap: () {
-              // Redireciona para a tela principal ou inicial
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => CadastroReceitas()), // Aqui você pode substituir "Metas" pela sua tela inicial se for diferente
+                MaterialPageRoute(builder: (context) => CadastroReceitas()), // Substitua "CadastroReceitas" pela sua tela inicial
               );
             },
           ),
@@ -50,6 +49,16 @@ class DrawerMenu extends StatelessWidget {
                 context,
                 MaterialPageRoute(builder: (context) => ViewCategoriesScreen()),
               );            
+            },
+          ),
+          // Novo botão para Relatórios
+          ListTile(
+            title: const Text('Relatórios'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Relatorios()), // Substitua por sua classe da página de relatórios
+              );
             },
           ),
           ListTile(
