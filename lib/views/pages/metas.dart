@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/progress_bar/gf_progress_bar.dart';
+import 'package:my_app/models/services/logout.dart';
+import 'package:my_app/views/pages/cadastroCategoria.dart';
+import '../components/constants.dart';  // Importando o arquivo de constantes para cores
+import 'package:my_app/views/pages/cadastroReceitas.dart';
+import 'package:my_app/views/pages/cadastro.dart';
+import 'package:my_app/widgets/drawer_menu.dart'; // Importando o DrawerMenu
+
 
 class Metas extends StatefulWidget {
   const Metas({super.key});
@@ -47,8 +54,14 @@ class _MetasState extends State<Metas> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Metas e Orçamento'),
-        backgroundColor: Colors.green,
+        title: const Text(
+          'Metas e Orçamento',
+          style: TextStyle(
+            color: Colors.white, // Cor branca para o texto
+            fontWeight: FontWeight.bold, // Tornar o texto em negrito
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
       ),
       backgroundColor: Colors.grey[100],
       body: SafeArea(
@@ -60,7 +73,7 @@ class _MetasState extends State<Metas> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
+                  children: <Widget>[ 
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -165,6 +178,7 @@ class _MetasState extends State<Metas> {
           ],
         ),
       ),
+      drawer: DrawerMenu(),
     );
   }
 }

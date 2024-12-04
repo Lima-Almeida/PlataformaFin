@@ -1,5 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:my_app/models/services/logout.dart';
+import 'package:my_app/models/services/receitasService.dart';
+import 'package:my_app/views/pages/cadastroCategoria.dart';
+import 'package:my_app/views/pages/login.dart';
+import 'package:my_app/views/pages/metas.dart';
+import 'package:my_app/widgets/drawer_menu.dart';
 
 class CadastroReceitas extends StatefulWidget {
   const CadastroReceitas({super.key});
@@ -9,73 +16,124 @@ class CadastroReceitas extends StatefulWidget {
 }
 
 class CadastroReceitasState extends State<CadastroReceitas> {
+  final user = FirebaseAuth.instance.currentUser;
   List<Map<String, dynamic>> receitasDespesas = [];
-
-  final CollectionReference receitasCollection = FirebaseFirestore.instance.collection('Receitas');
-  final CollectionReference despesasCollection = FirebaseFirestore.instance.collection('Despesas');
+  List<String> categoriasUsuario = [];
+  List<String> categoriasPredefinidas = [
+    'Alimentação', 'Transporte', 'Entretenimento'
+  ];
+  String? categoriaSelecionada;
 
   @override
   void initState() {
     super.initState();
-    getReceitasDespesas();
+    loadReceitasDespesas();
+    loadCategoriasUsuario();
   }
 
-  Future<void> getReceitasDespesas() async {
-    List<Map<String, dynamic>> receitas = [];
-    List<Map<String, dynamic>> despesas = [];
+  // Função para carregar as categorias criadas pelo usuário
+  void loadCategoriasUsuario() async {
+    final userId = user?.uid;
+    if (userId != null) {
+      final categoryCollection = FirebaseFirestore.instance
+          .collection('Usuários')
+          .doc(userId)
+          .collection('Categoria');
 
-    QuerySnapshot receitasSnapshot = await receitasCollection.get();
-    receitas = receitasSnapshot.docs.map((doc) {
-      return {
-        'id': doc.id,
-        'descricao': doc['descricao'],
-        'valor': doc['valor'],
-        'categoria': doc['categoria'],
-        'tipo': 'Receita',
-      };
-    }).toList();
+      // Carregar as categorias do usuário
+      final snapshot = await categoryCollection.get();
+      List<String> categorias = [];
+      for (var doc in snapshot.docs) {
+        categorias.add(doc['name']);
+      }
 
-    QuerySnapshot despesasSnapshot = await despesasCollection.get();
-    despesas = despesasSnapshot.docs.map((doc) {
-      return {
-        'id': doc.id,
-        'descricao': doc['descricao'],
-        'valor': doc['valor'],
-        'categoria': doc['categoria'],
-        'tipo': 'Despesa',
-      };
-    }).toList();
-
-    setState(() {
-      receitasDespesas = [...receitas, ...despesas];
-    });
-  }
-
-  Future<void> adicionarReceitaOuDespesa(String descricao, double valor, String tipo, String categoria) async {
-    if (tipo == 'Receita') {
-      await receitasCollection.add({
-        'descricao': descricao,
-        'valor': valor,
-        'categoria': categoria,
-      });
-    } else if (tipo == 'Despesa') {
-      await despesasCollection.add({
-        'descricao': descricao,
-        'valor': valor,
-        'categoria': categoria,
+      setState(() {
+        categoriasUsuario = categorias;
       });
     }
-    getReceitasDespesas();
   }
 
-  Future<void> removerReceitaOuDespesa(String id, String tipo) async {
-    if (tipo == 'Receita') {
-      await receitasCollection.doc(id).delete();
-    } else if (tipo == 'Despesa') {
-      await despesasCollection.doc(id).delete();
-    }
+  void loadReceitasDespesas() async {
+    final userId = user?.uid;
+    if (userId != null) {
+      final db = FirebaseFirestore.instance;
 
-    getReceitasDespesas();
+      final receitasSnapshot = await db.collection('Usuários').doc(userId).collection('Receitas').get();
+      final despesasSnapshot = await db.collection('Usuários').doc(userId).collection('Despesas').get();
+
+      List<Map<String, dynamic>> updatedList = [];
+      
+      // Carregar receitas
+      for (var doc in receitasSnapshot.docs) {
+        updatedList.add({
+          'id': doc.id,
+          'descricao': doc['descricao'],
+          'valor': doc['valor'],
+          'tipo': 'Receita',
+          'categoria': doc['categoria'],
+        });
+      }
+
+      // Carregar despesas
+      for (var doc in despesasSnapshot.docs) {
+        updatedList.add({
+          'id': doc.id,
+          'descricao': doc['descricao'],
+          'valor': doc['valor'],
+          'tipo': 'Despesa',
+          'categoria': doc['categoria'],
+        });
+      }
+
+      setState(() {
+        receitasDespesas = updatedList;
+      });
+    }
+  }
+
+  void adicionarRecOuDes(String descricao, double valor, String tipo, String categoria) async {
+    final userId = user?.uid;
+
+    if (userId != null) {
+      final db = FirebaseFirestore.instance;
+
+      final ref = db.collection('Usuários').doc(userId);
+
+      if (tipo == 'Receita') {
+        await ref.collection('Receitas').add({
+          'descricao': descricao,
+          'valor': valor,
+          'categoria': categoria,
+          'tipo': tipo,
+          'dataCriacao': FieldValue.serverTimestamp(),
+        });
+      } else if (tipo == 'Despesa') {
+        await ref.collection('Despesas').add({
+          'descricao': descricao,
+          'valor': valor,
+          'categoria': categoria,
+          'tipo': tipo,
+          'dataCriacao': FieldValue.serverTimestamp(),
+        });
+      }
+
+      loadReceitasDespesas();
+    }
+  }
+
+  void removerRecOuDes(String id, String tipo) async {
+    final userId = user?.uid;
+    if (userId != null) {
+      final db = FirebaseFirestore.instance;
+
+      if (tipo == 'Receita') {
+        await db.collection('Usuários').doc(userId).collection('Receitas').doc(id).delete();
+      } else if (tipo == 'Despesa') {
+        await db.collection('Usuários').doc(userId).collection('Despesas').doc(id).delete();
+      }
+
+      loadReceitasDespesas();
+    }
   }
 
   @override
@@ -83,9 +141,20 @@ class CadastroReceitasState extends State<CadastroReceitas> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Receitas e Despesas'),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.blue,
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
       ),
       backgroundColor: Colors.grey[100],
+      drawer: DrawerMenu(),
       body: SafeArea(
         child: Column(
           children: [
@@ -96,7 +165,6 @@ class CadastroReceitasState extends State<CadastroReceitas> {
                     DataColumn(label: Text('Descrição')),
                     DataColumn(label: Text('Valor')),
                     DataColumn(label: Text('Tipo')),
-                    //DataColumn(label: Text('Categoria')),
                     DataColumn(label: Text('Ações')),
                   ],
                   rows: receitasDespesas.map((item) {
@@ -108,7 +176,6 @@ class CadastroReceitasState extends State<CadastroReceitas> {
                             style: TextStyle(
                               color: item['tipo'] == 'Receita' ? Colors.green : Colors.red,
                             ))),
-                        //DataCell(Text(item['categoria'])),
                         DataCell(
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
@@ -171,19 +238,15 @@ class CadastroReceitasState extends State<CadastroReceitas> {
                     ),
                     DropdownButtonFormField<String>(
                       value: categoria,
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Alimentacao',
-                          child: Text('Alimentação'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Transporte',
-                          child: Text('Transporte'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Entretenimento',
-                          child: Text('Entretenimento'),
-                        ),
+                      items: [
+                        ...categoriasPredefinidas.map((cat) => DropdownMenuItem(
+                              value: cat,
+                              child: Text(cat),
+                            )),
+                        ...categoriasUsuario.map((cat) => DropdownMenuItem(
+                              value: cat,
+                              child: Text(cat),
+                            )),
                       ],
                       onChanged: (value) {
                         setState(() {
@@ -207,8 +270,11 @@ class CadastroReceitasState extends State<CadastroReceitas> {
                           valorController.text.isNotEmpty &&
                           tipoSelecionado != null &&
                           categoria != null) {
-                        adicionarReceitaOuDespesa(
-                            descricaoController.text, double.parse(valorController.text), tipoSelecionado!, categoria!);
+                        adicionarRecOuDes(
+                            descricaoController.text,
+                            double.parse(valorController.text),
+                            tipoSelecionado!,
+                            categoria!);
                         Navigator.pop(context);
                       }
                     },
@@ -219,7 +285,7 @@ class CadastroReceitasState extends State<CadastroReceitas> {
             },
           );
         },
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.blue,
         child: const Icon(Icons.add),
       ),
     );
@@ -243,7 +309,7 @@ class CadastroReceitasState extends State<CadastroReceitas> {
               child: const Text("Remover"),
               onPressed: () {
                 Navigator.of(context).pop();
-                removerReceitaOuDespesa(id, tipo);
+                removerRecOuDes(id, tipo);
               },
             ),
           ],
