@@ -156,7 +156,6 @@ class _RelatoriosState extends State<Relatorios> {
                       DataColumn(label: Text('Descrição')),
                       DataColumn(label: Text('Valor')),
                       DataColumn(label: Text('Tipo')),
-                      DataColumn(label: Text('Categoria')),
                     ],
                     rows: receitasDespesas.map((item) {
                       return DataRow(
@@ -171,7 +170,6 @@ class _RelatoriosState extends State<Relatorios> {
                                   : Colors.red,
                             ),
                           )),
-                          DataCell(Text(item['categoria'] ?? 'N/A')),
                         ],
                       );
                     }).toList(),
