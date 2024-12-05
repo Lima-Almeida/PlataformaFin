@@ -231,10 +231,6 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                 onPressed: () => addCategoryToFirebase(context),
                 child: const Text('Salvar Categoria'),
               ),
-              TextButton(
-                onPressed: resetForm,
-                child: const Text('Reiniciar'),
-              ),
             ],
           ),
         ),
