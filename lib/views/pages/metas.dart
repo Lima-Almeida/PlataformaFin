@@ -1,52 +1,84 @@
-import 'package:flutter/material.dart';
-import 'package:getwidget/components/progress_bar/gf_progress_bar.dart';
-import 'package:my_app/models/services/logout.dart';
-import 'package:my_app/views/pages/cadastroCategoria.dart';
-import '../components/constants.dart';  // Importando o arquivo de constantes para cores
-import 'package:my_app/views/pages/cadastroReceitas.dart';
-import 'package:my_app/views/pages/cadastro.dart';
 import 'package:my_app/widgets/drawer_menu.dart'; // Importando o DrawerMenu
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-
-class Metas extends StatefulWidget {
-  const Metas({super.key});
-  
+class ExpensesChartScreen extends StatefulWidget {
   @override
-  State<Metas> createState() => _MetasState();
+  _ExpensesChartScreenState createState() => _ExpensesChartScreenState();
 }
 
-class _MetasState extends State<Metas> {
-  double budget = 0.0;
-  double spending = 0.0;
-  final Color green = Colors.greenAccent;
-  final Color yellow = Colors.yellowAccent;
-  final Color red = Colors.redAccent;
-  Color currentColor = Colors.grey;
+class _ExpensesChartScreenState extends State<ExpensesChartScreen> {
+  User? user = FirebaseAuth.instance.currentUser;
+  int selectedYear = DateTime.now().year;
+  int selectedMonth = DateTime.now().month;
+  double totalLimit = 0.0;
+  double totalExpenses = 0.0;
 
   @override
   void initState() {
     super.initState();
-    getBudgetAndSpendings();
-    setCurrentColor();
+    _fetchTotalLimit();
+    _fetchTotalExpenses();
   }
 
-  void setCurrentColor() {
-    double ratio = spending / budget;
-    setState(() {
-      if (ratio <= 0.3) {
-        currentColor = green;
-      } else if (ratio <= 0.7) {
-        currentColor = yellow;
-      } else {
-        currentColor = red;
+  void _fetchTotalLimit() async {
+    if (user == null) return;
+
+    final categoriesSnapshot = await FirebaseFirestore.instance
+        .collection('Usuários')
+        .doc(user!.uid)
+        .collection('Categoria')
+        .get();
+
+    double limitSum = 0.0;
+
+    for (var category in categoriesSnapshot.docs) {
+      final monthsSnapshot = await category.reference
+          .collection('Anos')
+          .doc(selectedYear.toString())
+          .collection('Meses')
+          .doc(selectedMonth.toString())
+          .get();
+
+      if (monthsSnapshot.exists) {
+        final limit = monthsSnapshot['limite'] ?? 0.0;
+        limitSum += limit;
       }
+    }
+
+    setState(() {
+      totalLimit = limitSum;
     });
   }
 
-  Future<void> getBudgetAndSpendings() async {
+  void _fetchTotalExpenses() async {
+    if (user == null) return;
+
+    final categoriesSnapshot = await FirebaseFirestore.instance
+        .collection('Usuários')
+        .doc(user!.uid)
+        .collection('Categoria')
+        .get();
+
+    double expensesSum = 0.0;
+
+    for (var category in categoriesSnapshot.docs) {
+      final monthsSnapshot = await category.reference
+          .collection('Anos')
+          .doc(selectedYear.toString())
+          .collection('Meses')
+          .doc(selectedMonth.toString())
+          .get();
+
+      if (monthsSnapshot.exists) {
+        final expenses = monthsSnapshot['despesas'] ?? 0.0; // Supondo que 'despesas' seja o campo das despesas
+        expensesSum += expenses;
+      }
+    }
+
     setState(() {
-      budget = 100.0;
-      spending = 60.0;
+      totalExpenses = expensesSum;
     });
   }
 
@@ -54,131 +86,127 @@ class _MetasState extends State<Metas> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Metas e Orçamento',
-          style: TextStyle(
-            color: Colors.white, // Cor branca para o texto
-            fontWeight: FontWeight.bold, // Tornar o texto em negrito
-          ),
-        ),
-        backgroundColor: AppColors.primaryColor,
+        title: const Text('Gráfico de Despesas'),
+        backgroundColor: Colors.blue,
       ),
-      backgroundColor: Colors.grey[100],
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[ 
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text("Despesas"),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            "R\$${budget.toStringAsFixed(2)}",
-                            style: const TextStyle(
-                              fontSize: 30.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: const CircleBorder(),
-                              backgroundColor: const Color.fromARGB(255, 0, 161, 22),
-                            ),
-                            onPressed: () {
-                              final dinheiroController = TextEditingController(text: budget.toStringAsFixed(2));
-
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text("Redefinir Meta de Orçamento"),
-                                      content: TextFormField(
-                                        controller: dinheiroController,
-                                        decoration: const InputDecoration(labelText: 'Orçamento para o mês'),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text('Cancelar'),
-                                        ),
-                                        FilledButton(
-                                          onPressed: () {
-                                            if (dinheiroController.text.isNotEmpty) {
-                                              try {
-                                                double newBudget = double.parse(dinheiroController.text);
-                                                setState(() {
-                                                  budget = newBudget;
-                                                });
-                                                setCurrentColor();
-                                                Navigator.pop(context);
-                                              } catch (parseError) {
-                                                final scaffold = ScaffoldMessenger.of(context);
-                                                scaffold.showSnackBar(
-                                                  const SnackBar(content: Text("Por favor, digite um número")),
-                                                );
-                                              }
-                                            }
-                                          },
-                                          child: const Text("Confirmar"),
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            },
-                            child: const Icon(
-                              size: 20.0,
-                              Icons.edit,
-                              color: Color.fromARGB(255, 241, 241, 241),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    GFProgressBar(
-                      margin: const EdgeInsets.only(bottom: 5.0, left: 30.0, right: 30.0),
-                      percentage: spending / budget,
-                      animation: true,
-                      animateFromLastPercentage: true,
-                      animationDuration: 400,
-                      lineHeight: 25,
-                      padding: const EdgeInsets.only(right: 5),
-                      backgroundColor: const Color.fromARGB(255, 219, 219, 219),
-                      progressBarColor: currentColor,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "${(spending / budget * 100).toStringAsFixed(1)}%",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text("R\$${spending.toStringAsFixed(2)} out of R\$${budget.toStringAsFixed((2))}"),
-                  ],
+      drawer: DrawerMenu(),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                DropdownButton<int>(
+                  value: selectedYear,
+                  items: List.generate(
+                    10,
+                    (index) => DateTime.now().year - 5 + index,
+                  ).map((year) {
+                    return DropdownMenuItem(
+                      value: year,
+                      child: Text(year.toString()),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedYear = value;
+                        _fetchTotalLimit();
+                        _fetchTotalExpenses();
+                      });
+                    }
+                  },
                 ),
-              ),
+                DropdownButton<int>(
+                  value: selectedMonth,
+                  items: List.generate(12, (index) => index + 1).map((month) {
+                    return DropdownMenuItem(
+                      value: month,
+                      child: Text(_monthName(month)),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        selectedMonth = value;
+                        _fetchTotalLimit();
+                        _fetchTotalExpenses();
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Limite Total: R\$ ${totalLimit.toStringAsFixed(2)}',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            'Despesas Totais: R\$ ${totalExpenses.toStringAsFixed(2)}',
+            style: const TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: _buildBarChart(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBarChart() {
+    double progress = totalLimit > 0 ? totalExpenses / totalLimit : 0.0;
+
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Progresso das Despesas no Limite Mensal',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Container(
+                  height: 30,
+                  width: progress * MediaQuery.of(context).size.width,
+                  color: Colors.green,
+                ),
+                Container(
+                  height: 30,
+                  width: (1 - progress) * MediaQuery.of(context).size.width,
+                  color: Colors.red,
+                ),
+              ],
             ),
           ],
         ),
       ),
-      drawer: DrawerMenu(),
     );
   }
+}
+
+String _monthName(int month) {
+  const monthNames = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro'
+  ];
+  return monthNames[month - 1];
 }
