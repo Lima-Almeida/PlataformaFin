@@ -1,11 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:my_app/models/services/logout.dart';
-import 'package:my_app/models/services/receitasService.dart';
-import 'package:my_app/views/pages/cadastroCategoria.dart';
-import 'package:my_app/views/pages/login.dart';
-import 'package:my_app/views/pages/metas.dart';
+import 'package:intl/intl.dart';
 import 'package:my_app/widgets/drawer_menu.dart';
 
 class CadastroReceitas extends StatefulWidget {
@@ -23,6 +19,7 @@ class CadastroReceitasState extends State<CadastroReceitas> {
     'Alimentação', 'Transporte', 'Entretenimento'
   ];
   String? categoriaSelecionada;
+  DateTime selectedMonth = DateTime.now();
 
   @override
   void initState() {
@@ -53,17 +50,30 @@ class CadastroReceitasState extends State<CadastroReceitas> {
     }
   }
 
+
   void loadReceitasDespesas() async {
     final userId = user?.uid;
     if (userId != null) {
       final db = FirebaseFirestore.instance;
+      final startDate = DateTime(selectedMonth.year, selectedMonth.month, 1);
+      final endDate = DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
 
-      final receitasSnapshot = await db.collection('Usuários').doc(userId).collection('Receitas').get();
-      final despesasSnapshot = await db.collection('Usuários').doc(userId).collection('Despesas').get();
+      final receitasSnapshot = await db
+          .collection('Usuários')
+          .doc(userId)
+          .collection('Receitas')
+          .where('dataCriacao', isGreaterThanOrEqualTo: startDate)
+          .where('dataCriacao', isLessThanOrEqualTo: endDate)
+          .get();
+      final despesasSnapshot = await db
+          .collection('Usuários')
+          .doc(userId)
+          .collection('Despesas')
+          .where('dataCriacao', isGreaterThanOrEqualTo: startDate)
+          .where('dataCriacao', isLessThanOrEqualTo: endDate)
+          .get();
 
       List<Map<String, dynamic>> updatedList = [];
-      
-      // Carregar receitas
       for (var doc in receitasSnapshot.docs) {
         updatedList.add({
           'id': doc.id,
@@ -73,8 +83,6 @@ class CadastroReceitasState extends State<CadastroReceitas> {
           'categoria': doc['categoria'],
         });
       }
-
-      // Carregar despesas
       for (var doc in despesasSnapshot.docs) {
         updatedList.add({
           'id': doc.id,
@@ -84,7 +92,6 @@ class CadastroReceitasState extends State<CadastroReceitas> {
           'categoria': doc['categoria'],
         });
       }
-
       setState(() {
         receitasDespesas = updatedList;
       });
@@ -136,8 +143,16 @@ class CadastroReceitasState extends State<CadastroReceitas> {
     }
   }
 
+  void changeMonth(int delta) {
+    setState(() {
+      selectedMonth = DateTime(selectedMonth.year, selectedMonth.month + delta);
+    });
+    loadReceitasDespesas();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final monthName = DateFormat.yMMMM().format(selectedMonth);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Receitas e Despesas'),
@@ -158,6 +173,23 @@ class CadastroReceitasState extends State<CadastroReceitas> {
       body: SafeArea(
         child: Column(
           children: [
+                        Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chevron_left),
+                  onPressed: () => changeMonth(-1),
+                ),
+                Text(
+                  monthName,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right),
+                  onPressed: () => changeMonth(1),
+                ),
+              ],
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: DataTable(

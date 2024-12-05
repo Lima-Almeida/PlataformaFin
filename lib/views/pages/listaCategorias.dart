@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_app/views/pages/cadastroCategoria.dart';
-import 'package:my_app/widgets/drawer_menu.dart'; // Importando o DrawerMenu
+import 'package:my_app/widgets/drawer_menu.dart';
 
 class ViewCategoriesScreen extends StatefulWidget {
   @override
@@ -12,7 +12,7 @@ class ViewCategoriesScreen extends StatefulWidget {
 class _ViewCategoriesScreenState extends State<ViewCategoriesScreen> {
   User? user = FirebaseAuth.instance.currentUser;
   int selectedYear = DateTime.now().year;
-  int selectedMonth = DateTime.now().month; // Variável para o mês selecionado
+  int selectedMonth = DateTime.now().month;
 
   @override
   Widget build(BuildContext context) {
